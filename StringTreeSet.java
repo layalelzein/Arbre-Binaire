@@ -24,7 +24,7 @@ public class StringTreeSet {
             return this.suivant;
         }
 
-        public void setGaucheSuivant(Noeud n) {
+        public void setSuivantGauche(Noeud n) {
             this.gauche = n;
         }
 
