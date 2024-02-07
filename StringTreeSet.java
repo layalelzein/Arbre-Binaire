@@ -19,7 +19,15 @@ public class StringTreeSet {
         public void setSuivantDroite(Noeud n) {
             this.suivant = n;
         }
-    
+
+        public Noeud getSuivantDroite() {
+            return this.suivant;
+        }
+
+        public void setGaucheSuivant(Noeud n) {
+            this.gauche = n;
+        }
+
         public Noeud getSuivantGauche() {
             return this.suivant;
         }
@@ -32,8 +40,10 @@ public class StringTreeSet {
             return this.data;
         }
 
+        public Noeud getSuivant() {
+            return this.suivant;
+        }
+
     }
-
-
 
 }
