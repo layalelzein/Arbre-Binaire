@@ -80,6 +80,7 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
         } 
         
     */
+
     @Override
     public String toString() {
         if (this.racine != null) {
@@ -179,37 +180,81 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
     }
     */
 
-    //Pas finit j'arrive pas
     boolean remove(String s) {
-        Noeud courant = this.racine;
-        Noeud parent;
-
-        if(courant==null) {
-            return false;
-        }
-        else if(courant.getDroite()==null && courant.getGauche()==null) {
-            courant=null;
-            return true;
-        }
-
-        while (courant != null) {
-            int c = s.compareTo(courant.getData());
-            if (c == 0) {
-                if(courant.getDroite()==null && courant.getGauche()==null) {
-                    courant=null;
-                }
-                return true;
-            }
-            else if (c < 0) {
-                parent = courant;
+        Noeud courant = this.racine; 
+        Noeud parent = null;
+        boolean estGauche = true; 
+    
+        // recherche du noeud à supprimer
+        while (courant != null && !courant.getData().equals(s)) {
+            parent = courant; 
+            int c = s.compareTo(courant.getData()); 
+            if (c < 0) { // aller à gauche si la valeur est inf
+                estGauche = true;
                 courant = courant.getGauche();
-            } else {
-                parent = courant;
+            } else { // aller à droite si la valeur est sup
+                estGauche = false;
                 courant = courant.getDroite();
             }
         }
-        return true;
+        if (courant == null) { 
+            return false;
+        }
+    
+        // Cas sans enfant
+        if (courant.getGauche() == null && courant.getDroite() == null) { 
+            if (courant == racine) racine = null; // si c'est la racine, l'arbre devient null
+            else if (estGauche) parent.setGauche(null); // si c'est un enfant gauche, déconnecter du parent
+            else parent.setDroite(null); // si c'est un enfant droit, déconnecter du parent
+        }
+
+        // Cas avec un seul enfant à droite
+        else if (courant.getGauche() == null) { 
+            if (courant == racine) racine = courant.getDroite(); 
+            else if (estGauche) parent.setGauche(courant.getDroite()); 
+            else parent.setDroite(courant.getDroite());
+        }
+
+        // Cas avec un seul enfant à gauche
+        else if (courant.getDroite() == null) { 
+            if (courant == racine) racine = courant.getGauche(); 
+            else if (estGauche) parent.setGauche(courant.getGauche());
+            else parent.setDroite(courant.getGauche());
+        }
+
+        // Cas avec deux enfants
+        else { 
+            Noeud successeur = getSuccesseur(courant);
+            if (courant == racine) racine = successeur; 
+            else if (estGauche) parent.setGauche(successeur);
+            else parent.setDroite(successeur);
+            successeur.setGauche(courant.getGauche());
+        }
+    
+        return true; 
     }
+    
+    private Noeud getSuccesseur(Noeud delNoeud) {
+        Noeud successeurParent = delNoeud;
+        Noeud successeur = delNoeud;
+        Noeud courant = delNoeud.getDroite(); // on commence par l'enfant droit du noeud à sup
+    
+        // trouver le successeur (le + petit noeud du sous-arbre droit)
+        while (courant != null) {
+            successeurParent = successeur;
+            successeur = courant;
+            courant = courant.getGauche(); // aller tjr à gauche
+        }
+    
+        // si le successeur n'est pas l'enfant droit direct => réorganiser les liens
+        if (successeur != delNoeud.getDroite()) {
+            successeurParent.setGauche(successeur.getDroite()); // connecter l'enfant droit du successeur à son parent
+            successeur.setDroite(delNoeud.getDroite()); // connecter l'enfant droit du noeud supprimé au successeur
+        }
+    
+        return successeur;
+    }
+    
 
     int size() {
         return cpt;
@@ -218,33 +263,42 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
     public static void main(String[] args) {
         StringTreeSet treeSet = new StringTreeSet();
 
-        // Ajouter des éléments
         treeSet.add("banana");
         treeSet.add("apple");
         treeSet.add("orange");
         treeSet.add("amande");
-
-
-        // Afficher le contenu de l'arbre
-        System.out.println("Contenu de l'arbre : " + treeSet.toString());
+    
+        // Afficher le contenu de l'arbre 
+        System.out.println("Contenu de l'arbre : " + treeSet);
 
         // Vérifier la présence d'un élément
         System.out.println("Contient 'apple' : " + treeSet.contains("apple"));
         System.out.println("Contient 'grape' : " + treeSet.contains("grape"));
+    
+        // Tenter de supprimer un élément qui existe
+        boolean isRemoved = treeSet.remove("apple");
+        System.out.println("Suppression de 'apple' réussie ? " + isRemoved);
+        System.out.println("Contenu de l'arbre après suppression de 'apple' : " + treeSet);
+    
+        // Tenter de supprimer un élément qui n'existe pas
+        isRemoved = treeSet.remove("grape");
+        System.out.println("Suppression de 'grape' réussie ? " + isRemoved);
+        System.out.println("Contenu de l'arbre après tentative de suppression de 'grape' : " + treeSet);
 
         treeSet.clear();
-        System.out.println("Contenu de l'arbre : " + treeSet.toString() + " c'est " + treeSet.isEmpty());
+        System.out.println("Contenu de l'arbre après clear : " + treeSet.toString() + " c'est " + treeSet.isEmpty());
         System.out.println("Taille d'élément : " + treeSet.size());
-
-        // Ajouter des éléments
+    
+        // Ajouter de nouveaux éléments et réafficher
         treeSet.add("c");
         treeSet.add("banana");
         treeSet.add("apple");
         treeSet.add("ab");
-        
+    
+        System.out.println("Contenu de l'arbre après ajout de nouveaux éléments : " + treeSet);
         System.out.println("L'élément le plus à gauche : " + treeSet.first());
         System.out.println("Arbre vide ? " + treeSet.isEmpty());
-        System.out.println("Taille d'élément : " + treeSet.size());
-
+        System.out.println("Taille de l'élément : " + treeSet.size());
     }
+    
 }
