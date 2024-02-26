@@ -11,7 +11,6 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
         Noeud droite;
         Noeud parent;
 
-
         public Noeud(String data, Noeud gauche, Noeud droite) {
             this.data = data;
             this.gauche = gauche;
@@ -170,45 +169,84 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
         return this.racine == null;
     }
 
-    //J'arrive pas aussi
-    /* 
-    @Override
     public Iterator<String> iterator() {
         // Retourne une nouvelle instance de la classe interne StringTreeSetIterator
-        return new StringTreeSetIterator();
+        return new StringTreeSetIterator(this.racine);
     }
-    */
 
-    //Pas finit j'arrive pas
     boolean remove(String s) {
-        Noeud courant = this.racine;
-        Noeud parent;
-
-        if(courant==null) {
-            return false;
-        }
-        else if(courant.getDroite()==null && courant.getGauche()==null) {
-            courant=null;
-            return true;
-        }
-
-        while (courant != null) {
-            int c = s.compareTo(courant.getData());
-            if (c == 0) {
-                if(courant.getDroite()==null && courant.getGauche()==null) {
-                    courant=null;
-                }
-                return true;
-            }
-            else if (c < 0) {
-                parent = courant;
+        Noeud courant = this.racine; 
+        Noeud parent = null;
+        boolean estGauche = true; 
+    
+        // recherche du noeud à supprimer
+        while (courant != null && !courant.getData().equals(s)) {
+            parent = courant; 
+            int c = s.compareTo(courant.getData()); 
+            if (c < 0) { // aller à gauche si la valeur est inf
+                estGauche = true;
                 courant = courant.getGauche();
-            } else {
-                parent = courant;
+            } else { // aller à droite si la valeur est sup
+                estGauche = false;
                 courant = courant.getDroite();
             }
         }
-        return true;
+        if (courant == null) { 
+            return false;
+        }
+    
+        // Cas sans enfant
+        if (courant.getGauche() == null && courant.getDroite() == null) { 
+            if (courant == racine) racine = null; // si c'est la racine, l'arbre devient null
+            else if (estGauche) parent.setGauche(null); // si c'est un enfant gauche, déconnecter du parent
+            else parent.setDroite(null); // si c'est un enfant droit, déconnecter du parent
+        }
+
+        // Cas avec un seul enfant à droite
+        else if (courant.getGauche() == null) { 
+            if (courant == racine) racine = courant.getDroite(); 
+            else if (estGauche) parent.setGauche(courant.getDroite()); 
+            else parent.setDroite(courant.getDroite());
+        }
+
+        // Cas avec un seul enfant à gauche
+        else if (courant.getDroite() == null) { 
+            if (courant == racine) racine = courant.getGauche(); 
+            else if (estGauche) parent.setGauche(courant.getGauche());
+            else parent.setDroite(courant.getGauche());
+        }
+
+        // Cas avec deux enfants
+        else { 
+            Noeud successeur = getSuccesseur(courant);
+            if (courant == racine) racine = successeur; 
+            else if (estGauche) parent.setGauche(successeur);
+            else parent.setDroite(successeur);
+            successeur.setGauche(courant.getGauche());
+        }
+    
+        return true; 
+    }
+    
+    private Noeud getSuccesseur(Noeud delNoeud) {
+        Noeud successeurParent = delNoeud;
+        Noeud successeur = delNoeud;
+        Noeud courant = delNoeud.getDroite(); // on commence par l'enfant droit du noeud à sup
+    
+        // trouver le successeur (le + petit noeud du sous-arbre droit)
+        while (courant != null) {
+            successeurParent = successeur;
+            successeur = courant;
+            courant = courant.getGauche(); // aller tjr à gauche
+        }
+    
+        // si le successeur n'est pas l'enfant droit direct => réorganiser les liens
+        if (successeur != delNoeud.getDroite()) {
+            successeurParent.setGauche(successeur.getDroite()); // connecter l'enfant droit du successeur à son parent
+            successeur.setDroite(delNoeud.getDroite()); // connecter l'enfant droit du noeud supprimé au successeur
+        }
+    
+        return successeur;
     }
 
     int size() {
@@ -245,6 +283,18 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
         System.out.println("L'élément le plus à gauche : " + treeSet.first());
         System.out.println("Arbre vide ? " + treeSet.isEmpty());
         System.out.println("Taille d'élément : " + treeSet.size());
+
+        // Utilisation de l'itérateur pour parcourir les éléments dans l'ordre croissant
+        Iterator<String> iterator = treeSet.iterator();
+        while (iterator.hasNext()) {
+            String element = iterator.next();
+            System.out.println("Element: " + element);
+        }
+
+        treeSet.remove("ab");
+        System.out.println("Contenu de l'arbre : " + treeSet.toString());
+
+        
 
     }
 }
