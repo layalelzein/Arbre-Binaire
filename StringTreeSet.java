@@ -6,15 +6,24 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
     int cpt;
 
     public class Noeud {
+
+        public enum Couleur {
+            ROUGE,
+            NOIR
+        }
+
+
         String data;
         Noeud gauche;
         Noeud droite;
+        Couleur couleur;
         Noeud parent;
 
-        public Noeud(String data, Noeud gauche, Noeud droite) {
+        public Noeud(String data, Noeud gauche, Noeud droite, Couleur couleur) {
             this.data = data;
             this.gauche = gauche;
             this.droite = droite;
+            this.couleur = couleur;
         }
 
         public void setParent(Noeud n) {
