@@ -171,14 +171,10 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
         return this.racine == null;
     }
 
-    //J'arrive pas aussi
-    /* 
-    @Override
     public Iterator<String> iterator() {
         // Retourne une nouvelle instance de la classe interne StringTreeSetIterator
-        return new StringTreeSetIterator();
+        return new StringTreeSetIterator(this.racine);
     }
-    */
 
     boolean remove(String s) {
         Noeud courant = this.racine; 
@@ -299,6 +295,16 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
         System.out.println("L'élément le plus à gauche : " + treeSet.first());
         System.out.println("Arbre vide ? " + treeSet.isEmpty());
         System.out.println("Taille de l'élément : " + treeSet.size());
+
+        // Utilisation de l'itérateur pour parcourir les éléments dans l'ordre croissant
+        Iterator<String> iterator = treeSet.iterator();
+        while (iterator.hasNext()) {
+            String element = iterator.next();
+            System.out.println("Element: " + element);
+        }
+
+        treeSet.remove("ab");
+        System.out.println("Contenu de l'arbre : " + treeSet.toString());
     }
     
 }
