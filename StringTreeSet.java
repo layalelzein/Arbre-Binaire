@@ -5,17 +5,24 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
     Noeud racine;
     int cpt;
 
+    public enum Couleur {
+        ROUGE,
+        NOIR
+    }
+
     public class Noeud {
-        String data;
-        Noeud gauche;
-        Noeud droite;
+ 
+        private String data;
+        private Noeud gauche;
+        private Noeud droite;
+        Couleur couleur;
         Noeud parent;
 
-
-        public Noeud(String data, Noeud gauche, Noeud droite) {
+        public Noeud(String data, Noeud gauche, Noeud droite, Couleur couleur) {
             this.data = data;
             this.gauche = gauche;
             this.droite = droite;
+            this.couleur = couleur;
         }
 
         public void setParent(Noeud n) {
@@ -80,7 +87,6 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
         } 
         
     */
-
     @Override
     public String toString() {
         if (this.racine != null) {
@@ -106,13 +112,29 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
 
     boolean add(String s) {
         if (this.racine == null) {
-            this.racine = new Noeud(s, null, null);
+            this.racine = new Noeud(s, null, null, null);
             this.cpt++;
             return true;
         }
+
         Noeud parent = null;
         Noeud courant = this.racine;
         int c = 0;
+        
+        // Define constructor in Noeud class
+        class Noeud {
+            private String data;
+            private Noeud gauche;
+            private Noeud droite;
+
+            public Noeud(String data, Noeud gauche, Noeud droite) {
+                this.data = data;
+                this.gauche = gauche;
+                this.droite = droite;
+            }
+            
+            // Getters and setters
+        }
         while (courant != null) {
             c = s.compareTo(courant.getData());
             if (c == 0) {
@@ -126,9 +148,9 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
             }
         }
         if (c < 0) {
-            parent.setGauche(new Noeud(s, null, null));
+            parent.setGauche(new StringTreeSet.Noeud(s, null, null,null));
         } else {
-            parent.setDroite(new Noeud(s, null, null));
+            parent.setDroite(new StringTreeSet.Noeud(s, null, null, null));
         }
         this.cpt++;
         return true;
@@ -250,7 +272,6 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
     
         return successeur;
     }
-    
 
     int size() {
         return cpt;
@@ -259,42 +280,33 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
     public static void main(String[] args) {
         StringTreeSet treeSet = new StringTreeSet();
 
+        // Ajouter des éléments
         treeSet.add("banana");
         treeSet.add("apple");
         treeSet.add("orange");
         treeSet.add("amande");
-    
-        // Afficher le contenu de l'arbre 
-        System.out.println("Contenu de l'arbre : " + treeSet);
+
+
+        // Afficher le contenu de l'arbre
+        System.out.println("Contenu de l'arbre : " + treeSet.toString());
 
         // Vérifier la présence d'un élément
         System.out.println("Contient 'apple' : " + treeSet.contains("apple"));
         System.out.println("Contient 'grape' : " + treeSet.contains("grape"));
-    
-        // Tenter de supprimer un élément qui existe
-        boolean isRemoved = treeSet.remove("apple");
-        System.out.println("Suppression de 'apple' réussie ? " + isRemoved);
-        System.out.println("Contenu de l'arbre après suppression de 'apple' : " + treeSet);
-    
-        // Tenter de supprimer un élément qui n'existe pas
-        isRemoved = treeSet.remove("grape");
-        System.out.println("Suppression de 'grape' réussie ? " + isRemoved);
-        System.out.println("Contenu de l'arbre après tentative de suppression de 'grape' : " + treeSet);
 
         treeSet.clear();
-        System.out.println("Contenu de l'arbre après clear : " + treeSet.toString() + " c'est " + treeSet.isEmpty());
+        System.out.println("Contenu de l'arbre : " + treeSet.toString() + " c'est " + treeSet.isEmpty());
         System.out.println("Taille d'élément : " + treeSet.size());
-    
-        // Ajouter de nouveaux éléments et réafficher
+
+        // Ajouter des éléments
         treeSet.add("c");
         treeSet.add("banana");
         treeSet.add("apple");
         treeSet.add("ab");
-    
-        System.out.println("Contenu de l'arbre après ajout de nouveaux éléments : " + treeSet);
+        
         System.out.println("L'élément le plus à gauche : " + treeSet.first());
         System.out.println("Arbre vide ? " + treeSet.isEmpty());
-        System.out.println("Taille de l'élément : " + treeSet.size());
+        System.out.println("Taille d'élément : " + treeSet.size());
 
         // Utilisation de l'itérateur pour parcourir les éléments dans l'ordre croissant
         Iterator<String> iterator = treeSet.iterator();
@@ -305,6 +317,8 @@ public class StringTreeSet implements Comparable<StringTreeSet> {
 
         treeSet.remove("ab");
         System.out.println("Contenu de l'arbre : " + treeSet.toString());
+
+        
+
     }
-    
 }
